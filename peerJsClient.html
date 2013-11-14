@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test PeerJs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script> 
+    <script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+	 <script>
+	 var peer;
+	 var myId;
+	 var conn;
+	 function connectToS(){
+	 //alert("now starting to connect...");
+	 //var peer = new Peer({key: 'cn35y7u03t7yzaor'});
+	 //var idPeer=prompt("Please enter your ID","someId");
+
+	 peer = new Peer({host: 'localhost', port: 9000});
+	 peer.on('open', function(id) {
+		console.log('My peer ID is: ' + id);
+		myId=id;
+		$('#idPeer').append(id);
+			});
+	}
+	
+	function connectToAnother(){
+		console.log('connect to another started');
+	  //var idPeerToCon=prompt("Please enter ID of peer you want to talk to","someId");
+		var idPeerToCon=$('#idPeer2').val();
+		conn = peer.connect(idPeerToCon); 
+
+  // Send messages
+		
+		console.log('connected to other peer ');
+	}
+	function sendMsgToAnother(){
+		conn.send(myId+': '+'Hello!');
+		console.log('msg sent to other peer!');
+	}
+	function receiveConnection(){
+		console.log('received cnx started');
+		peer.on('connection', function(connection) {
+			console.log('received cnx established');
+      // This `connection` is a DataConnection object with which we can send
+      // data.
+      // The `open` event firing means that the connection is now ready to
+      // transmit data.
+	  
+			connection.on('open', function() {
+				// Send 'Hello' on the connection.
+				console.log('received cnx established data being transmited');
+				//connection.send('Hello,');
+				connection.on('data', function(data) {
+				// Append the data to body.
+					console.log('received cnx established data received',data);
+					$('#msg').append(data+'\n');
+				});
+				//connection.send('hello');
+			});
+      // The `data` event is fired when data is received on the connection.
+			
+			
+    });
+	console.log('received cnx finished');
+	}
+	
+	</script>
+  </head>
+  <body>
+  
+  <button onclick="connectToS()">connect to the server</button>
+  </br> my id is : <div id="idPeer"></div>
+   </br>   
+   <button onclick="receiveConnection()">listen to messages</button>
+    </br>   
+   msg received are:</br>     
+   <textarea rows="4" cols="50" id="msg">
+   </textarea>  
+ </br>     
+   ID of the other peer to send him a msg : </br> 
+   <input type="text" id="idPeer2" name="idPeer2"/>
+   <button onclick="connectToAnother()">connect to another peer</button>
+   <button onclick="sendMsgToAnother()">send message to another peer</button>
+  </body>
+</html>
+  
